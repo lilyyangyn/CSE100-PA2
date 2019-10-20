@@ -1,7 +1,9 @@
 /**
- * TODO: File Header
+ * This file declares the structure of DictionaryTrie class,
+ * including its private variables and public methods.
  *
- * Author:
+ * Author: Yuening YANG, Shenlang ZHOU
+ * Email: y3yang@ucsd.edu
  */
 #ifndef DICTIONARY_TRIE_HPP
 #define DICTIONARY_TRIE_HPP
@@ -18,7 +20,26 @@ using namespace std;
  */
 class DictionaryTrie {
   private:
-    // TODO: add private members and helper methods here
+    /* inner class which defines a node of ternary trie */
+    class Node {
+      public:
+        Node* left;
+        Node* mid;
+        Node* right;
+        char letter;
+        bool is_word;
+        unsigned int freq;
+
+        Node(char letter) : letter(letter), is_word(false), freq(0) {
+            left = nullptr;
+            mid = nullptr;
+            right = nullptr;
+        }
+    };
+
+    // ptr to the root of the trie, or 0 if empty trie
+    Node* root;
+
   public:
     /* TODO: add function header */
     DictionaryTrie();
@@ -39,6 +60,9 @@ class DictionaryTrie {
 
     /* TODO: add function header */
     ~DictionaryTrie();
-};
 
+  private:
+    /* helper function for destructor */
+    void deleteAll(Node* ptr);
+};
 #endif  // DICTIONARY_TRIE_HPP

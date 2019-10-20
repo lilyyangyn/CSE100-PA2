@@ -29,14 +29,14 @@ TEST(DictTrieTests, EMPTY_TEST) {
     ASSERT_EQ(dict.find("abrakadabra"), false);
 }
 
-TEST(DictTrieTest, EMPTY_PREDICT_COMPLETIONS_TEST) {
+TEST(DictTrieTests, EMPTY_PREDICT_COMPLETIONS_TEST) {
     // expect predict_completions() on empty trie
     //      returns an empty vector
     DictionaryTrie dict;
     EXPECT_EQ(dict.predictCompletions("a", 4).size(), 0);
 }
 
-TEST(DictTrieTest, EMPTY_PREDICT_UNDERSCORES_TEST) {
+TEST(DictTrieTests, EMPTY_PREDICT_UNDERSCORES_TEST) {
     // yet to be implemented in part2
 }
 
