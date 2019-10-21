@@ -97,7 +97,7 @@ TEST_F(SmallDictTrieFixture, SMALL_PREDICT_COMPLETIONS_TEST) {
     EXPECT_EQ(dict.predictCompletions("e", 5), vtr1);
     // expect return "add" rather than "ant" (the same freq)
     //      according to the alphabet
-    vector<string> vtr2{"a", "add"};
+    vector<string> vtr2{"a", "and"};
     EXPECT_EQ(dict.predictCompletions("a", 2), vtr2);
     // expect return first 4 words in trie according to their freq
     vector<string> vtr3{"a", "and", "ant", "exist"};

@@ -34,6 +34,7 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
                 } else {
                     // not found, create new left child
                     ptr->left = new Node(letter);
+                    ptr->left->parent = ptr;
                     ptr = ptr->left;
                     break;
                 }
@@ -44,6 +45,7 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
                 } else {
                     // not found, create new right child
                     ptr->right = new Node(letter);
+                    ptr->right->parent = ptr;
                     ptr = ptr->right;
                     break;
                 }
@@ -68,6 +70,7 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
                     } else {
                         // not found, create new mid node
                         ptr->mid = new Node(letter);
+                        ptr->mid->parent = ptr;
                         ptr = ptr->mid;
                         break;
                     }
@@ -81,6 +84,7 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
         letter = word[i];
         i++;
         ptr->mid = new Node(letter);
+        ptr->mid->parent = ptr;
         ptr = ptr->mid;
     }
     // set the last letter as 'word'. store its frequency
@@ -136,7 +140,75 @@ bool DictionaryTrie::find(string word) const {
 /* TODO */
 vector<string> DictionaryTrie::predictCompletions(string prefix,
                                                   unsigned int numCompletions) {
-    return {};
+    vector<string> results;
+    if (root == 0) {
+        // empty tree, no completions
+        return results;
+    }
+
+    Node* ptr = root;
+    // if prefix is not empty string, then search whether completion exists
+    if (prefix.length() != 0) {
+        char letter = prefix[0];
+        int i = 1;
+
+        // search whether completion exists in the trie
+        //      if exists, ptr pointing to the last letter of prefix
+        //      if not exists, return an empty vector
+        while (true) {
+            if (letter < ptr->letter) {
+                // into left subtree
+                if (ptr->left != nullptr) {
+                    ptr = ptr->left;
+                } else {
+                    // no completion exists
+                    return results;
+                }
+            } else if (letter > ptr->letter) {
+                // into right subtree
+                if (ptr->right != nullptr) {
+                    ptr = ptr->right;
+                } else {
+                    // no completion exists
+                    return results;
+                }
+            } else {
+                // into middle subtree
+                if (i == prefix.length()) {
+                    break;
+                } else {
+                    if (ptr->mid != nullptr) {
+                        letter = prefix[i];
+                        i++;
+                        ptr = ptr->mid;
+                    } else {
+                        // no completion exists
+                        return results;
+                    }
+                }
+            }
+        }
+    }
+
+    vector<Node*> vtr;
+    if (prefix.length() == 0) {
+        inorderTraversal(root, vtr);
+    } else {
+        if (ptr->is_word) {
+            vtr.push_back(ptr);
+        }
+        inorderTraversal(ptr->mid, vtr);
+    }
+    sort(vtr.begin(), vtr.end(), CompFreq());
+
+    for (int i = 0; i < numCompletions; i++) {
+        if (i < vtr.size()) {
+            results.push_back(vtr[i]->getWord());
+        } else {
+            break;
+        }
+    }
+    return results;
 }
 
 /* TODO */
@@ -156,4 +228,44 @@ void DictionaryTrie::deleteAll(Node* ptr) {
     deleteAll(ptr->mid);
     deleteAll(ptr->right);
     delete ptr;
+}
+
+void DictionaryTrie::inorderTraversal(Node* ptr, vector<Node*>& vtr) {
+    if (ptr == nullptr) {
+        return;
+    }
+    inorderTraversal(ptr->left, vtr);
+    if (ptr->is_word) {
+        vtr.push_back(ptr);
+    }
+    inorderTraversal(ptr->mid, vtr);
+    inorderTraversal(ptr->right, vtr);
+}
+
+bool DictionaryTrie::CompFreq::operator()(const Node* p1, const Node* p2) {
+    return p1->freq > p2->freq;
+}
+
+DictionaryTrie::Node::Node(char letter)
+    : letter(letter), is_word(false), freq(0) {
+    left = nullptr;
+    mid = nullptr;
+    right = nullptr;
+    parent = nullptr;
+}
+
+string DictionaryTrie::Node::getWord() {
+    if (!is_word) {
+        return "";
+    }
+    string s = "";
+    Node* ptr = this;
+    s = ptr->letter + s;
+    while (ptr->parent != nullptr) {
+        if (ptr->parent->mid == ptr) {
+            s = ptr->parent->letter + s;
+        }
+        ptr = ptr->parent;
+    }
+    return s;
 }

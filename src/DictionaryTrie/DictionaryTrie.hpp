@@ -8,6 +8,7 @@
 #ifndef DICTIONARY_TRIE_HPP
 #define DICTIONARY_TRIE_HPP
 
+#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
@@ -17,24 +18,24 @@ using namespace std;
 /**
  * The class for a dictionary ADT, implemented as either
  * a mulit-way trie or a ternary search tree.
+ * Here we use a ternary search tree
  */
 class DictionaryTrie {
   private:
-    /* inner class which defines a node of ternary trie */
+    /** inner class which defines a node of TST */
     class Node {
       public:
         Node* left;
         Node* mid;
         Node* right;
+        Node* parent;
         char letter;
         bool is_word;
         unsigned int freq;
 
-        Node(char letter) : letter(letter), is_word(false), freq(0) {
-            left = nullptr;
-            mid = nullptr;
-            right = nullptr;
-        }
+        Node(char letter);
+
+        string getWord();
     };
 
     // ptr to the root of the trie, or 0 if empty trie
@@ -62,7 +63,16 @@ class DictionaryTrie {
     ~DictionaryTrie();
 
   private:
-    /* helper function for destructor */
+    /** helper function for destructor */
     void deleteAll(Node* ptr);
+
+    /** inorder traverse through the subtree with given root,
+          store all words in subtree into vector */
+    void inorderTraversal(Node* ptr, vector<Node*>& vtr);
+
+    /** the comparator used in sorting nodes based on their frequecy */
+    struct CompFreq {
+        bool operator()(const Node* p1, const Node* p2);
+    };
 };
 #endif  // DICTIONARY_TRIE_HPP
