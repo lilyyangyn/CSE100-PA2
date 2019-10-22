@@ -63,7 +63,7 @@ class SmallDictTrieFixture : public ::testing::Test {
 
   public:
     SmallDictTrieFixture() {
-        vector<string> inputs{"exist", "a", "ant", "and"};
+        vector<string> inputs{"exist", "a", "ant", "and", "octorber"};
         vector<int> freqs{200, 1000, 400, 400};
         for (int i = 0; i < inputs.size(); i++) {
             dict.insert(inputs[i], freqs[i]);
@@ -72,10 +72,14 @@ class SmallDictTrieFixture : public ::testing::Test {
 };
 
 TEST_F(SmallDictTrieFixture, SMALL_FIND_TEST) {
-    // expect to find "exist" which is in dict
+    // expect to find word which is in dict
     EXPECT_TRUE(dict.find("exist"));
+    EXPECT_TRUE(dict.find("and"));
+    EXPECT_TRUE(dict.find("octorber"));
     // expect not to find "not_exist" which is not in dict
     EXPECT_FALSE(dict.find("not_exist"));
+    // expect not to find with empty input
+    EXPECT_FALSE(dict.find(""));
 }
 
 TEST_F(SmallDictTrieFixture, SMALL_INSERT_TEST) {
@@ -106,6 +110,8 @@ TEST_F(SmallDictTrieFixture, SMALL_PREDICT_COMPLETIONS_TEST) {
 
 TEST_F(SmallDictTrieFixture, SMALL_PREDICT_UNDERSCORES_TEST) {
     // yet to be implemented in part2
+    dict.predictUnderscores("", 4);
+    EXPECT_TRUE(1);
 }
 
 /* Destructor test */
