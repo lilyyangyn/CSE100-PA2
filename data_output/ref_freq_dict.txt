@@ -1,0 +1,33 @@
+Reading file: data/freq_dict.txt
+Enter a prefix/pattern to search for:
+Enter a number of completions:
+american
+among
+am
+america
+amount
+among the
+amount of
+americas
+amy
+americans
+Continue? (y/n)
+Enter a prefix/pattern to search for:
+Enter a number of completions:
+is
+is a
+is the
+isnt
+is not
+Continue? (y/n)
+Enter a prefix/pattern to search for:
+Enter a number of completions:
+so
+some
+something
+social
+some of
+someone
+son
+sometimes
+Continue? (y/n)
