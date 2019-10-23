@@ -3,7 +3,7 @@
  * including its private variables and public methods.
  *
  * Author: Yuening YANG, Shenlang ZHOU
- * Email: y3yang@ucsd.edu
+ * Email: y3yang@ucsd.edu shzhou@ucsd.edu
  */
 #ifndef DICTIONARY_TRIE_HPP
 #define DICTIONARY_TRIE_HPP
@@ -42,24 +42,28 @@ class DictionaryTrie {
     Node* root;
 
   public:
-    /* TODO: add function header */
+    /* It is the constructor*/
+    
     DictionaryTrie();
 
-    /* TODO: add function header */
+    /* This is the function to insert the word into the trie. Argument is 
+    frequency and the word itself and return wherther the word is well inserted*/
     bool insert(string word, unsigned int freq);
 
-    /* TODO: add function header */
+    /* This is the function to find whether the word is in the trie. The argument is the word and return
+    whether it is found.*/
     bool find(string word) const;
 
-    /* TODO: add function header */
+   /* Use frequency to complete the predict completions. Arguments are prefix and number of 
+results we need. Return the list with the predictions amounting to the number of numCompletions */
     vector<string> predictCompletions(string prefix,
                                       unsigned int numCompletions);
 
-    /* TODO: add function header */
+    /*  */
     vector<string> predictUnderscores(string pattern,
                                       unsigned int numCompletions);
 
-    /* TODO: add function header */
+    /* This is the destructor */
     ~DictionaryTrie();
 
   private:
@@ -67,10 +71,10 @@ class DictionaryTrie {
     void deleteAll(Node* ptr);
 
     /** inorder traverse through the subtree with given root,
-          store all words in subtree into vector */
+          store all words in subtree into vector The argument is a node and a vector to store all of the words*/
     void inorderTraversal(Node* ptr, vector<Node*>& vtr);
 
-    /** the comparator used in sorting nodes based on their frequecy */
+    /** the comparator used in sorting nodes based on their frequecy Get the frequency and compare them. The argument is the two nodes*/
     struct CompFreq {
         bool operator()(const Node* p1, const Node* p2);
     };
