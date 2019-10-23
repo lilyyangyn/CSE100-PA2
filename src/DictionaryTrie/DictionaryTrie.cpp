@@ -4,15 +4,21 @@
  * in "DictionaryTrie.hpp"
  *
  * Author: Yuening YANG, Shenlang ZHOU
- * Email: y3yang@ucsd.edu
+ * Email: y3yang@ucsd.edu shzhou@ucsd.edu
  */
 #include "DictionaryTrie.hpp"
 #include <iostream>
 
-/* TODO */
+/* /**
+ * The class for a dictionary ADT, implemented as either
+ * a mulit-way trie or a ternary search tree.
+ * Here we use a ternary search tree
+ */
+/* It is the constructor*/
 DictionaryTrie::DictionaryTrie() { root = 0; }
 
-/* TODO */
+/* This is the function to insert the word into the trie. Argument is 
+    frequency and the word itself and return wherther the word is well inserted*/
 bool DictionaryTrie::insert(string word, unsigned int freq) {
     if (word.length() == 0) {
         return false;
@@ -93,7 +99,8 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
     return true;
 }
 
-/* TODO */
+/* This is the function to find whether the word is in the trie. The argument is the word and return
+    whether it is found. */
 bool DictionaryTrie::find(string word) const {
     if (word.length() == 0) {
         return false;
@@ -137,7 +144,8 @@ bool DictionaryTrie::find(string word) const {
     }
 }
 
-/* TODO */
+/* Use frequency to complete the predict completions. Arguments are prefix and number of 
+results we need. Return the list with the predictions amounting to the number of numCompletions */
 vector<string> DictionaryTrie::predictCompletions(string prefix,
                                                   unsigned int numCompletions) {
     vector<string> results;
@@ -211,15 +219,16 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
     return results;
 }
 
-/* TODO */
+/*  */
 std::vector<string> DictionaryTrie::predictUnderscores(
     string pattern, unsigned int numCompletions) {
     return {};
 }
 
-/* TODO */
+/* This is the destructor */
 DictionaryTrie::~DictionaryTrie() { deleteAll(root); }
 
+/* This function recursively deletes all the nodes. The argument is the pointer to be deleted*/
 void DictionaryTrie::deleteAll(Node* ptr) {
     if (ptr == 0) {
         return;
@@ -230,6 +239,8 @@ void DictionaryTrie::deleteAll(Node* ptr) {
     delete ptr;
 }
 
+
+/* This the function to traverse the function. The argument is a node and a vector to store all of the words */
 void DictionaryTrie::inorderTraversal(Node* ptr, vector<Node*>& vtr) {
     if (ptr == nullptr) {
         return;
@@ -241,11 +252,11 @@ void DictionaryTrie::inorderTraversal(Node* ptr, vector<Node*>& vtr) {
     inorderTraversal(ptr->mid, vtr);
     inorderTraversal(ptr->right, vtr);
 }
-
+/* Get the frequency and compare them. The argument is the two nodes */
 bool DictionaryTrie::CompFreq::operator()(const Node* p1, const Node* p2) {
     return p1->freq > p2->freq;
 }
-
+/*  Create a node. Argument is a letter to be inserted  */
 DictionaryTrie::Node::Node(char letter)
     : letter(letter), is_word(false), freq(0) {
     left = nullptr;
@@ -253,7 +264,7 @@ DictionaryTrie::Node::Node(char letter)
     right = nullptr;
     parent = nullptr;
 }
-
+/* to get the word from the chosen word node  */
 string DictionaryTrie::Node::getWord() {
     if (!is_word) {
         return "";
