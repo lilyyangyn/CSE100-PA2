@@ -43,23 +43,29 @@ class DictionaryTrie {
 
   public:
     /* It is the constructor*/
-    
+
     DictionaryTrie();
 
-    /* This is the function to insert the word into the trie. Argument is 
-    frequency and the word itself and return wherther the word is well inserted*/
+    /* This is the function to insert the word into the trie.
+        arguments: word to insert, frequency of that word
+        return: true if insertion is successful, false otherwise
+     */
     bool insert(string word, unsigned int freq);
 
-    /* This is the function to find whether the word is in the trie. The argument is the word and return
-    whether it is found.*/
+    /* This is the function to find whether the word is in the trie.
+        arguments: the target word
+        return true if the word is found, false otherwise
+     */
     bool find(string word) const;
 
-   /* Use frequency to complete the predict completions. Arguments are prefix and number of 
-results we need. Return the list with the predictions amounting to the number of numCompletions */
+    /* Use frequency to complete the predict completions.
+        arguments: prefix, number of completions return.
+        return: a list of completions, sorted by their frequency
+     */
     vector<string> predictCompletions(string prefix,
                                       unsigned int numCompletions);
 
-    /*  */
+    /* TODO */
     vector<string> predictUnderscores(string pattern,
                                       unsigned int numCompletions);
 
@@ -67,14 +73,20 @@ results we need. Return the list with the predictions amounting to the number of
     ~DictionaryTrie();
 
   private:
-    /** helper function for destructor */
+    /* Helper function for destructor. Recursively deletes all the nodes.
+        argument: a pointer pointing to the root of the subtree to be deleted.
+     */
     void deleteAll(Node* ptr);
 
-    /** inorder traverse through the subtree with given root,
-          store all words in subtree into vector The argument is a node and a vector to store all of the words*/
+    /* inorder traverse through the subtree with given root, store all words
+      in subtree into vector.
+        arguments: the root of the subtree, a vector to store all of the words
+     */
     void inorderTraversal(Node* ptr, vector<Node*>& vtr);
 
-    /** the comparator used in sorting nodes based on their frequecy Get the frequency and compare them. The argument is the two nodes*/
+    /* the comparator used in sorting nodes based on their frequecy.
+        arguments: two nodes to be compared
+     */
     struct CompFreq {
         bool operator()(const Node* p1, const Node* p2);
     };

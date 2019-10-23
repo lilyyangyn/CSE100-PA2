@@ -4,21 +4,18 @@
  * in "DictionaryTrie.hpp"
  *
  * Author: Yuening YANG, Shenlang ZHOU
- * Email: y3yang@ucsd.edu shzhou@ucsd.edu
+ * Email: y3yang@ucsd.edu, shzhou@ucsd.edu
  */
 #include "DictionaryTrie.hpp"
 #include <iostream>
 
-/* /**
- * The class for a dictionary ADT, implemented as either
- * a mulit-way trie or a ternary search tree.
- * Here we use a ternary search tree
- */
 /* It is the constructor*/
 DictionaryTrie::DictionaryTrie() { root = 0; }
 
-/* This is the function to insert the word into the trie. Argument is 
-    frequency and the word itself and return wherther the word is well inserted*/
+/* This is the function to insert the word into the trie.
+    arguments: word to insert, frequency of that word
+    return: true if insertion is successful, false otherwise
+ */
 bool DictionaryTrie::insert(string word, unsigned int freq) {
     if (word.length() == 0) {
         return false;
@@ -99,8 +96,10 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
     return true;
 }
 
-/* This is the function to find whether the word is in the trie. The argument is the word and return
-    whether it is found. */
+/* This is the function to find whether the word is in the trie.
+    arguments: the target word
+    return true if the word is found, false otherwise
+ */
 bool DictionaryTrie::find(string word) const {
     if (word.length() == 0) {
         return false;
@@ -144,8 +143,10 @@ bool DictionaryTrie::find(string word) const {
     }
 }
 
-/* Use frequency to complete the predict completions. Arguments are prefix and number of 
-results we need. Return the list with the predictions amounting to the number of numCompletions */
+/* Use frequency to complete the predict completions.
+    arguments: prefix, number of completions return.
+    return: a list of completions, sorted by their frequency
+ */
 vector<string> DictionaryTrie::predictCompletions(string prefix,
                                                   unsigned int numCompletions) {
     vector<string> results;
@@ -219,7 +220,7 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
     return results;
 }
 
-/*  */
+/* TODO */
 std::vector<string> DictionaryTrie::predictUnderscores(
     string pattern, unsigned int numCompletions) {
     return {};
@@ -228,7 +229,9 @@ std::vector<string> DictionaryTrie::predictUnderscores(
 /* This is the destructor */
 DictionaryTrie::~DictionaryTrie() { deleteAll(root); }
 
-/* This function recursively deletes all the nodes. The argument is the pointer to be deleted*/
+/* Helper function for destructor. Recursively deletes all the nodes.
+    argument: a pointer pointing to the root of the subtree to be deleted.
+ */
 void DictionaryTrie::deleteAll(Node* ptr) {
     if (ptr == 0) {
         return;
@@ -239,8 +242,10 @@ void DictionaryTrie::deleteAll(Node* ptr) {
     delete ptr;
 }
 
-
-/* This the function to traverse the function. The argument is a node and a vector to store all of the words */
+/* inorder traverse through the subtree with given root, store all words
+    in subtree into vector.
+        arguments: the root of the subtree, a vector to store all of the words
+ */
 void DictionaryTrie::inorderTraversal(Node* ptr, vector<Node*>& vtr) {
     if (ptr == nullptr) {
         return;
@@ -252,11 +257,13 @@ void DictionaryTrie::inorderTraversal(Node* ptr, vector<Node*>& vtr) {
     inorderTraversal(ptr->mid, vtr);
     inorderTraversal(ptr->right, vtr);
 }
-/* Get the frequency and compare them. The argument is the two nodes */
+/* the comparator used in sorting nodes based on their frequecy.
+        arguments: two nodes to be compared
+ */
 bool DictionaryTrie::CompFreq::operator()(const Node* p1, const Node* p2) {
     return p1->freq > p2->freq;
 }
-/*  Create a node. Argument is a letter to be inserted  */
+/*  Create a node. Argument: a letter to be inserted  */
 DictionaryTrie::Node::Node(char letter)
     : letter(letter), is_word(false), freq(0) {
     left = nullptr;
@@ -264,7 +271,7 @@ DictionaryTrie::Node::Node(char letter)
     right = nullptr;
     parent = nullptr;
 }
-/* to get the word from the chosen word node  */
+/* get the word from the chosen word node by iteration to the root  */
 string DictionaryTrie::Node::getWord() {
     if (!is_word) {
         return "";

@@ -1,8 +1,9 @@
 /*
- * This file is used to for detailed implementation of autocomplete and i t seeks
- * to use the frequency of the words to predict based on the prefixes.
+ * This file is used to for detailed implementation of autocomplete and i t
+ * seeks to use the frequency of the words to predict based on the prefixes.
+ *
  * Author: Yuening YANG, Shenlang ZHOU
- * Email: y3yang@ucsd.edu shzhou@ucsd.edu
+ * Email: y3yang@ucsd.edu, shzhou@ucsd.edu
  */
 #include <fstream>
 #include <iostream>
