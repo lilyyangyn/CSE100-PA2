@@ -9,6 +9,7 @@
 #define DICTIONARY_TRIE_HPP
 
 #include <algorithm>
+#include <queue>
 #include <string>
 #include <utility>
 #include <vector>
@@ -73,6 +74,13 @@ class DictionaryTrie {
     ~DictionaryTrie();
 
   private:
+    /* the comparator used in sorting nodes based on their frequecy.
+        arguments: two nodes to be compared
+     */
+    struct CompFreq {
+        bool operator()(const pair<int, string>& p1, const pair<int, string>& p2);
+    };
+
     /* Helper function for destructor. Recursively deletes all the nodes.
         argument: a pointer pointing to the root of the subtree to be deleted.
      */
@@ -82,13 +90,12 @@ class DictionaryTrie {
       in subtree into vector.
         arguments: the root of the subtree, a vector to store all of the words
      */
-    void inorderTraversal(Node* ptr, vector<Node*>& vtr);
+    void inorderTraversal(
+        Node* ptr,
+        priority_queue<pair<int, string>, vector<pair<int, string>>, CompFreq>&
+            q,
+        int k);
 
-    /* the comparator used in sorting nodes based on their frequecy.
-        arguments: two nodes to be compared
-     */
-    struct CompFreq {
-        bool operator()(const Node* p1, const Node* p2);
-    };
+    vector<string> underscoreHelper(string prefix, int numCompletions){};
 };
 #endif  // DICTIONARY_TRIE_HPP

@@ -199,22 +199,22 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
         }
     }
 
-    vector<Node*> vtr;
+    // vector<Node*> vtr;
+    // implement PQ to improve efficiency
+    priority_queue<pair<int, string>, vector<pair<int, string>>, CompFreq> q;
     if (prefix.length() == 0) {
-        inorderTraversal(root, vtr);
+        inorderTraversal(root, q, numCompletions);
     } else {
         if (ptr->is_word) {
-            vtr.push_back(ptr);
+            q.push(pair<int, string>(ptr->freq, ptr->getWord()));
         }
-        inorderTraversal(ptr->mid, vtr);
+        inorderTraversal(ptr->mid, q, numCompletions);
     }
-    sort(vtr.begin(), vtr.end(), CompFreq());
 
     for (int i = 0; i < numCompletions; i++) {
-        if (i < vtr.size()) {
-            results.push_back(vtr[i]->getWord());
-        } else {
-            break;
+        if (q.size() > 0) {
+            results.push_back(q.top().second);
+            q.pop();
         }
     }
     return results;
@@ -223,7 +223,12 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
 /* TODO */
 std::vector<string> DictionaryTrie::predictUnderscores(
     string pattern, unsigned int numCompletions) {
-    return {};
+    if (pattern.size() == 0) {
+        // if enter an empty string, return nothing
+        return {};
+    }
+
+    return underscoreHelper(pattern, numCompletions);
 }
 
 /* This is the destructor */
@@ -246,22 +251,37 @@ void DictionaryTrie::deleteAll(Node* ptr) {
     in subtree into vector.
         arguments: the root of the subtree, a vector to store all of the words
  */
-void DictionaryTrie::inorderTraversal(Node* ptr, vector<Node*>& vtr) {
+void DictionaryTrie::inorderTraversal(
+    Node* ptr,
+    priority_queue<pair<int, string>, vector<pair<int, string>>, CompFreq>& q,
+    int k) {
     if (ptr == nullptr) {
         return;
     }
-    inorderTraversal(ptr->left, vtr);
+    inorderTraversal(ptr->left, q, k);
     if (ptr->is_word) {
-        vtr.push_back(ptr);
+        if (q.size() < k) {
+            q.push(pair<int, string>(ptr->freq, ptr->getWord()));
+        } else {
+            if (ptr->freq > q.top().first) {
+                q.pop();
+                q.push(pair<int, string>(ptr->freq, ptr->getWord()));
+            }
+        }
     }
-    inorderTraversal(ptr->mid, vtr);
-    inorderTraversal(ptr->right, vtr);
+    inorderTraversal(ptr->mid, q, k);
+    inorderTraversal(ptr->right, q, k);
 }
 /* the comparator used in sorting nodes based on their frequecy.
         arguments: two nodes to be compared
  */
-bool DictionaryTrie::CompFreq::operator()(const Node* p1, const Node* p2) {
-    return p1->freq > p2->freq;
+bool DictionaryTrie::CompFreq::operator()(const pair<int, string>& p1,
+                                          const pair<int, string>& p2) {
+    if (p1.first == p2.first) {
+        return p1.second > p2.second;
+    } else {
+        return p1.first < p2.first;
+    }
 }
 /*  Create a node. Argument: a letter to be inserted  */
 DictionaryTrie::Node::Node(char letter)
