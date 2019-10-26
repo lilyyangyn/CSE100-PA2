@@ -109,9 +109,34 @@ TEST_F(SmallDictTrieFixture, SMALL_PREDICT_COMPLETIONS_TEST) {
 }
 
 TEST_F(SmallDictTrieFixture, SMALL_PREDICT_UNDERSCORES_TEST) {
-    // yet to be implemented in part2
-    dict.predictUnderscores("", 4);
-    EXPECT_TRUE(1);
+    // expect empty vector when no underscore-input
+    EXPECT_EQ(dict.predictUnderscores("", 4).size(), 0);
+    // expect empty vector when the completion is definetely not in trie
+    EXPECT_EQ(dict.predictUnderscores("z_", 4).size, 0);
+    // expect empty vector when the completion is possibly in
+    //      but actually not in trie [letter not match]
+    EXPECT_EQ(dict.predictCompletions("ex_is", 4).size(), 0);
+    // expect empty vector when the completion is possibly in
+    //      but actually not in trie [size of underscore not match]
+    EXPECT_EQ(dict.predictUnderscores("ex__st", 4).size(), 0);
+
+    // expect find matched completion
+    vector<string> vtr1{"exist"};
+    //      [underscore in the middle]
+    EXPECT_EQ(dict.predictUnderscores("ex_st", 2), vtr1);
+    //      [underscore in the end]
+    EXPECT_EQ(dict.predictUnderscores("exis_", 2), vtr1);
+    //      [underscore in the beginning]
+    EXPECT_EQ(dict.predictUnderscores("_xist", 2), vtr1);
+    //      [mixed positions of underscore]
+    EXPECT_EQ(dict.predictUnderscores("_x_s_", 2), vtr1);
+    // expect find matched completion
+    vector<string> vtr2{"and"};
+    //      [completions with the same freq should be sorted by alphabet]
+    EXPECT_EQ(dict.predictUnderscores("an_", 1), vtr2);
+    // expect find matched completion with all-underscore
+    vector<string> vtr3{"and, ant"};
+    EXPECT_EQ(dict.predictUnderscores("___", 5), vtr3);
 }
 
 /* Destructor test */
