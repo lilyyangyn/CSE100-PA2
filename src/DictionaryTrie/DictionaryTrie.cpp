@@ -220,7 +220,14 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
     return results;
 }
 
-/* TODO */
+/* function for wildcard prediction
+          arguments: pattern with (or without) underscore(s)
+                      number of completions desired
+          return: a list of completions.
+          hints: if the patter is empty, the returned list is empty
+                if the patter is without underscore, return that patter
+                  if it is a word in the trie
+ */
 std::vector<string> DictionaryTrie::predictUnderscores(
     string pattern, unsigned int numCompletions) {
     vector<string> results;
@@ -291,6 +298,14 @@ void DictionaryTrie::inorderTraversal(
     inorderTraversal(ptr->right, q, k);
 }
 
+/* helper method for predictUnderscore, so that we could fill in the underscore
+        and recursive down.
+          arguments: subpattern (ignore the part before the undersocre we just
+   filled in)， a pointer pointing to node the lettter of which is used to fill
+   in the underscore a priority_queue used to store the completions k
+   (numOfCompletions) determines the max-size of PQ we want, in order to improve
+   efficiency
+ */
 void DictionaryTrie::underscoreHelper(
     string pattern, Node* ptr,
     priority_queue<pair<int, string>, vector<pair<int, string>>, CompFreq>& q,
