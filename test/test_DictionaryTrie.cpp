@@ -48,14 +48,18 @@ TEST(DictTrieTests, EMPTY_PREDICT_UNDERSCORES_TEST) {
  *
  * Builds the following Dictionary Trie:
  *          e
- *        / |
- *      (a) x
- *       |  |
- *       n  i
- *       |  |
- *      (t) s
- *      /   |
- *    (d)  (t)
+ *        / | \
+ *      (a) x  o
+ *       |  |  |
+ *       n  i  c
+ *       |  |  |
+ *      (t) s  t
+ *      /   |  |
+ *    (d)  (t) b
+ *             |
+ *             e
+ *             |
+ *            (r)
  */
 class SmallDictTrieFixture : public ::testing::Test {
   protected:
@@ -63,8 +67,9 @@ class SmallDictTrieFixture : public ::testing::Test {
 
   public:
     SmallDictTrieFixture() {
-        vector<string> inputs{"exist", "a", "ant", "and", "octorber"};
-        vector<int> freqs{200, 1000, 400, 400};
+        vector<string> inputs{"exist",    "a",  "ant",     "and",
+                              "octorber", "an", "ancester"};
+        vector<int> freqs{200, 1000, 400, 400, 300, 800, 0};
         for (int i = 0; i < inputs.size(); i++) {
             dict.insert(inputs[i], freqs[i]);
         }
@@ -101,10 +106,10 @@ TEST_F(SmallDictTrieFixture, SMALL_PREDICT_COMPLETIONS_TEST) {
     EXPECT_EQ(dict.predictCompletions("e", 5), vtr1);
     // expect return "add" rather than "ant" (the same freq)
     //      according to the alphabet
-    vector<string> vtr2{"a", "and"};
+    vector<string> vtr2{"a", "an"};
     EXPECT_EQ(dict.predictCompletions("a", 2), vtr2);
     // expect return first 4 words in trie according to their freq
-    vector<string> vtr3{"a", "and", "ant", "exist"};
+    vector<string> vtr3{"a", "an", "and", "ant"};
     EXPECT_EQ(dict.predictCompletions("", 4), vtr3);
 }
 
@@ -112,7 +117,7 @@ TEST_F(SmallDictTrieFixture, SMALL_PREDICT_UNDERSCORES_TEST) {
     // expect empty vector when no underscore-input
     EXPECT_EQ(dict.predictUnderscores("", 4).size(), 0);
     // expect empty vector when the completion is definetely not in trie
-    EXPECT_EQ(dict.predictUnderscores("z_", 4).size, 0);
+    EXPECT_EQ(dict.predictUnderscores("z_", 4).size(), 0);
     // expect empty vector when the completion is possibly in
     //      but actually not in trie [letter not match]
     EXPECT_EQ(dict.predictCompletions("ex_is", 4).size(), 0);
@@ -134,9 +139,13 @@ TEST_F(SmallDictTrieFixture, SMALL_PREDICT_UNDERSCORES_TEST) {
     vector<string> vtr2{"and"};
     //      [completions with the same freq should be sorted by alphabet]
     EXPECT_EQ(dict.predictUnderscores("an_", 1), vtr2);
+
     // expect find matched completion with all-underscore
-    vector<string> vtr3{"and, ant"};
+    vector<string> vtr3{"and", "ant"};
     EXPECT_EQ(dict.predictUnderscores("___", 5), vtr3);
+    // expect return original word if in trie and pattern without underscore
+    vector<string> vtr4{"a"};
+    EXPECT_EQ(dict.predictUnderscores("a", 10), vtr4);
 }
 
 /* Destructor test */

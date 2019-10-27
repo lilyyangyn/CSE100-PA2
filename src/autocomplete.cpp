@@ -77,9 +77,26 @@ int main(int argc, char** argv) {
         cout << "Enter a number of completions:" << endl;
         cin >> numberOfCompletions;
 
-        vector<string> vtr = dt->predictCompletions(word, numberOfCompletions);
-        for (string w : vtr) {
-            cout << w << endl;
+        // determine whther word contains underscore
+        bool containUnderscore = false;
+        for (int i = 0; i < word.length(); i++) {
+            if (word[i] == '_') {
+                containUnderscore = true;
+                break;
+            }
+        }
+
+        vector<string> vtr;
+        if (containUnderscore) {
+            vtr = dt->predictUnderscores(word, numberOfCompletions);
+            for (string w : vtr) {
+                cout << w << endl;
+            }
+        } else {
+            vtr = dt->predictCompletions(word, numberOfCompletions);
+            for (string w : vtr) {
+                cout << w << endl;
+            }
         }
 
         cout << "Continue? (y/n)" << endl;

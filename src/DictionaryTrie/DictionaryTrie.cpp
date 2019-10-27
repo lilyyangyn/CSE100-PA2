@@ -199,7 +199,6 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
         }
     }
 
-    // vector<Node*> vtr;
     // implement PQ to improve efficiency
     priority_queue<pair<int, string>, vector<pair<int, string>>, CompFreq> q;
     if (prefix.length() == 0) {
@@ -217,18 +216,33 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
             q.pop();
         }
     }
+    reverse(results.begin(), results.end());
     return results;
 }
 
 /* TODO */
 std::vector<string> DictionaryTrie::predictUnderscores(
     string pattern, unsigned int numCompletions) {
-    if (pattern.size() == 0) {
+    vector<string> results;
+    if (root == 0) {
+        // empty tree, no completions
+        return results;
+    }
+    if (pattern.length() == 0) {
         // if enter an empty string, return nothing
-        return {};
+        return results;
     }
 
-    return underscoreHelper(pattern, numCompletions);
+    priority_queue<pair<int, string>, vector<pair<int, string>>, CompFreq> q;
+    underscoreHelper(pattern, root, q, numCompletions);
+    for (int i = 0; i < numCompletions; i++) {
+        if (q.size() > 0) {
+            results.push_back(q.top().second);
+            q.pop();
+        }
+    }
+    reverse(results.begin(), results.end());
+    return results;
 }
 
 /* This is the destructor */
@@ -266,21 +280,101 @@ void DictionaryTrie::inorderTraversal(
             if (ptr->freq > q.top().first) {
                 q.pop();
                 q.push(pair<int, string>(ptr->freq, ptr->getWord()));
+            } else if (ptr->freq == q.top().first &&
+                       ptr->getWord() < q.top().second) {
+                q.pop();
+                q.push(pair<int, string>(ptr->freq, ptr->getWord()));
             }
         }
     }
     inorderTraversal(ptr->mid, q, k);
     inorderTraversal(ptr->right, q, k);
 }
+
+void DictionaryTrie::underscoreHelper(
+    string pattern, Node* ptr,
+    priority_queue<pair<int, string>, vector<pair<int, string>>, CompFreq>& q,
+    int k) {
+    if (ptr == 0) {
+        return;
+    }
+    if (pattern.length() == 0) {
+        return;
+    }
+
+    char letter = pattern[0];
+    int i = 1;
+    while (true) {
+        if (letter == '_') {
+            // if 'underscore', replace it with possible letter and do recursion
+            string nextPattern = ptr->letter + pattern.substr(i);
+            underscoreHelper(nextPattern, ptr, q, k);
+            if (ptr->left != nullptr) {
+                nextPattern = ptr->left->letter + pattern.substr(i);
+                underscoreHelper(nextPattern, ptr->left, q, k);
+            }
+            if (ptr->right != nullptr) {
+                nextPattern = ptr->right->letter + pattern.substr(i);
+                underscoreHelper(nextPattern, ptr->right, q, k);
+            }
+            return;
+        }
+        if (letter < ptr->letter) {
+            // into left subtree
+            if (ptr->left != nullptr) {
+                ptr = ptr->left;
+            } else {
+                return;
+            }
+        } else if (letter > ptr->letter) {
+            // into right subtree
+            if (ptr->right != nullptr) {
+                ptr = ptr->right;
+            } else {
+                return;
+            }
+        } else {
+            // into middle subtree
+            if (i == pattern.length()) {
+                if (ptr->is_word) {
+                    if (q.size() < k) {
+                        q.push(pair<int, string>(ptr->freq, ptr->getWord()));
+                    } else {
+                        if (ptr->freq > q.top().first) {
+                            q.pop();
+                            q.push(
+                                pair<int, string>(ptr->freq, ptr->getWord()));
+                        } else if (ptr->freq == q.top().first &&
+                                   ptr->getWord() < q.top().second) {
+                            q.pop();
+                            q.push(
+                                pair<int, string>(ptr->freq, ptr->getWord()));
+                        }
+                    }
+                }
+                return;
+            } else {
+                if (ptr->mid != nullptr) {
+                    letter = pattern[i];
+                    ptr = ptr->mid;
+                    i = i + 1;
+                } else {
+                    return;
+                }
+            }
+        }
+    }
+}
+
 /* the comparator used in sorting nodes based on their frequecy.
         arguments: two nodes to be compared
  */
 bool DictionaryTrie::CompFreq::operator()(const pair<int, string>& p1,
                                           const pair<int, string>& p2) {
     if (p1.first == p2.first) {
-        return p1.second > p2.second;
+        return p1.second < p2.second;
     } else {
-        return p1.first < p2.first;
+        return p1.first > p2.first;
     }
 }
 /*  Create a node. Argument: a letter to be inserted  */

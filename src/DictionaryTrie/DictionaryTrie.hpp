@@ -78,7 +78,8 @@ class DictionaryTrie {
         arguments: two nodes to be compared
      */
     struct CompFreq {
-        bool operator()(const pair<int, string>& p1, const pair<int, string>& p2);
+        bool operator()(const pair<int, string>& p1,
+                        const pair<int, string>& p2);
     };
 
     /* Helper function for destructor. Recursively deletes all the nodes.
@@ -96,6 +97,10 @@ class DictionaryTrie {
             q,
         int k);
 
-    vector<string> underscoreHelper(string prefix, int numCompletions){};
+    void underscoreHelper(
+        string pattern, Node* ptr,
+        priority_queue<pair<int, string>, vector<pair<int, string>>, CompFreq>&
+            q,
+        int k);
 };
 #endif  // DICTIONARY_TRIE_HPP
