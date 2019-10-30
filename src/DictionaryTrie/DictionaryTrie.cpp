@@ -62,6 +62,14 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
                         // the word is not in the trie. mark it as 'word'
                         ptr->is_word = true;
                         ptr->freq = freq;
+                        while (ptr != nullptr) {
+                            if (freq > ptr->maxFreq) {
+                                ptr->maxFreq = freq;
+                            } else {
+                                break;
+                            }
+                            ptr = ptr->parent;
+                        }
                         return true;
                     }
                 } else {
@@ -93,6 +101,14 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
     // set the last letter as 'word'. store its frequency
     ptr->is_word = true;
     ptr->freq = freq;
+    while (ptr != nullptr) {
+        if (freq > ptr->maxFreq) {
+            ptr->maxFreq = freq;
+        } else {
+            break;
+        }
+        ptr = ptr->parent;
+    }
     return true;
 }
 
@@ -202,12 +218,12 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
     // implement PQ to improve efficiency
     priority_queue<pair<int, string>, vector<pair<int, string>>, CompFreq> q;
     if (prefix.length() == 0) {
-        inorderTraversal(root, q, numCompletions);
+        dfs(root, "", q, numCompletions);
     } else {
         if (ptr->is_word) {
-            q.push(pair<int, string>(ptr->freq, ptr->getWord()));
+            q.push(pair<int, string>(ptr->freq, prefix));
         }
-        inorderTraversal(ptr->mid, q, numCompletions);
+        dfs(ptr->mid, prefix, q, numCompletions);
     }
 
     for (int i = 0; i < numCompletions; i++) {
@@ -268,43 +284,78 @@ void DictionaryTrie::deleteAll(Node* ptr) {
     delete ptr;
 }
 
-/* inorder traverse through the subtree with given root, store all words
-    in subtree into vector.
-        arguments: the root of the subtree, a vector to store all of the words
- */
-void DictionaryTrie::inorderTraversal(
-    Node* ptr,
+/* traverse through the subtree with given root, prune the branch if the
+    root of that branch fail to meet the requirement of being pushed to PQ
+        arguments: the root of the subtree,
+        a path showing how to reach the parent of the root, or empty if no
+      parent,
+        a piority queue to store all of the words,
+        the max size of PQ, which equals to numCompletions
+*/
+void DictionaryTrie::dfs(
+    Node* ptr, string path,
     priority_queue<pair<int, string>, vector<pair<int, string>>, CompFreq>& q,
     int k) {
     if (ptr == nullptr) {
+        // if empty tree, return
         return;
     }
-    inorderTraversal(ptr->left, q, k);
+
+    if (ptr->parent == nullptr || ptr->parent->mid == ptr) {
+        path = path + ptr->letter;
+    } else {
+        path[path.length() - 1] = ptr->letter;
+    }
+    if (q.size() >= k) {
+        // if PQ already full
+        if (ptr->maxFreq < q.top().first) {
+            // if maxFreq of the subtree < mimFreq in heap, return
+            return;
+        } else if (ptr->maxFreq == q.top().first && path > q.top().second) {
+            // if maxFreq of the subtree < mimFreq in heap, and with larger
+            // alphabet-order, return
+            return;
+        }
+    }
+
+    // check current node
     if (ptr->is_word) {
         if (q.size() < k) {
-            q.push(pair<int, string>(ptr->freq, ptr->getWord()));
+            // if PQ not full, push
+            q.push(pair<int, string>(ptr->freq, path));
         } else {
+            // if PQ full, compare with the min element
             if (ptr->freq > q.top().first) {
                 q.pop();
-                q.push(pair<int, string>(ptr->freq, ptr->getWord()));
-            } else if (ptr->freq == q.top().first &&
-                       ptr->getWord() < q.top().second) {
+                q.push(pair<int, string>(ptr->freq, path));
+            } else if (ptr->freq == q.top().first && path < q.top().second) {
                 q.pop();
-                q.push(pair<int, string>(ptr->freq, ptr->getWord()));
+                q.push(pair<int, string>(ptr->freq, path));
             }
         }
     }
-    inorderTraversal(ptr->mid, q, k);
-    inorderTraversal(ptr->right, q, k);
+
+    // sort the maxFreq(s) of children
+    vector<Node*> vtr;
+    for (Node* p : {ptr->left, ptr->mid, ptr->right}) {
+        if (p != nullptr) {
+            vtr.push_back(p);
+        }
+    }
+    sort(vtr.begin(), vtr.end(), CompNodeByMaxFrequent());
+
+    // recursive to children by decreasing maxFreq
+    for (Node* p : vtr) {
+        dfs(p, path, q, k);
+    }
 }
 
-/* helper method for predictUnderscore, so that we could fill in the underscore
-        and recursive down.
-          arguments: subpattern (ignore the part before the undersocre we just
-   filled in)， a pointer pointing to node the lettter of which is used to fill
-   in the underscore a priority_queue used to store the completions k
-   (numOfCompletions) determines the max-size of PQ we want, in order to improve
-   efficiency
+/* helper method for predictUnderscore, so that we could fill in the
+   underscore and recursive down. arguments: subpattern (ignore the part
+   before the undersocre we just filled in)， a pointer pointing to node the
+   lettter of which is used to fill in the underscore a priority_queue used
+   to store the completions k (numOfCompletions) determines the max-size of
+   PQ we want, in order to improve efficiency
  */
 void DictionaryTrie::underscoreHelper(
     string pattern, Node* ptr,
@@ -321,7 +372,8 @@ void DictionaryTrie::underscoreHelper(
     int i = 1;
     while (true) {
         if (letter == '_') {
-            // if 'underscore', replace it with possible letter and do recursion
+            // if 'underscore', replace it with possible letter and do
+            // recursion
             string nextPattern = ptr->letter + pattern.substr(i);
             underscoreHelper(nextPattern, ptr, q, k);
             if (ptr->left != nullptr) {
@@ -392,9 +444,14 @@ bool DictionaryTrie::CompFreq::operator()(const pair<int, string>& p1,
         return p1.first > p2.first;
     }
 }
+bool DictionaryTrie::CompNodeByMaxFrequent::operator()(const Node* ptr1,
+                                                       const Node* ptr2) {
+    return ptr1->maxFreq < ptr2->maxFreq;
+}
+
 /*  Create a node. Argument: a letter to be inserted  */
 DictionaryTrie::Node::Node(char letter)
-    : letter(letter), is_word(false), freq(0) {
+    : letter(letter), is_word(false), freq(0), maxFreq(0) {
     left = nullptr;
     mid = nullptr;
     right = nullptr;

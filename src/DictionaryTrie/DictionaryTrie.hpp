@@ -9,6 +9,7 @@
 #define DICTIONARY_TRIE_HPP
 
 #include <algorithm>
+#include <chrono>
 #include <queue>
 #include <string>
 #include <utility>
@@ -33,6 +34,7 @@ class DictionaryTrie {
         char letter;
         bool is_word;
         unsigned int freq;
+        unsigned int maxFreq;
 
         Node(char letter);
 
@@ -88,20 +90,26 @@ class DictionaryTrie {
                         const pair<int, string>& p2);
     };
 
+    struct CompNodeByMaxFrequent {
+        bool operator()(const Node* ptr1, const Node* ptr2);
+    };
     /* Helper function for destructor. Recursively deletes all the nodes.
         argument: a pointer pointing to the root of the subtree to be deleted.
      */
     void deleteAll(Node* ptr);
 
-    /* inorder traverse through the subtree with given root, store all words
-      in subtree into vector.
-        arguments: the root of the subtree, a vector to store all of the words
+    /* traverse through the subtree with given root, prune the branch if the
+      root of that branch fail to meet the requirement of being pushed to PQ
+        arguments: the root of the subtree,
+        a path showing how to reach the parent of the root, or empty if no
+      parent,
+        a piority queue to store all of the words,
+        the max size of PQ, which equals to numCompletions
      */
-    void inorderTraversal(
-        Node* ptr,
-        priority_queue<pair<int, string>, vector<pair<int, string>>, CompFreq>&
-            q,
-        int k);
+    void dfs(Node* ptr, string path,
+             priority_queue<pair<int, string>, vector<pair<int, string>>,
+                            CompFreq>& q,
+             int k);
 
     /* helper method for predictUnderscore, so that we could fill in the
        underscore and recursive down. arguments: subpattern (ignore the part
@@ -116,4 +124,5 @@ class DictionaryTrie {
             q,
         int k);
 };
+
 #endif  // DICTIONARY_TRIE_HPP

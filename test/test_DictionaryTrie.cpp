@@ -51,15 +51,15 @@ TEST(DictTrieTests, EMPTY_PREDICT_UNDERSCORES_TEST) {
  *        / | \
  *      (a) x  o
  *       |  |  |
- *       n  i  c
+ *      (n) i  c
  *       |  |  |
  *      (t) s  t
  *      /   |  |
  *    (d)  (t) b
- *             |
- *             e
- *             |
- *            (r)
+ *    /        |
+ *   c         e
+ *   |         |
+ *  ...       (r)
  */
 class SmallDictTrieFixture : public ::testing::Test {
   protected:
