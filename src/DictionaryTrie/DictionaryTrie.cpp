@@ -171,6 +171,10 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
         return results;
     }
 
+    if (numCompletions == 0) {
+        return results;
+    }
+
     Node* ptr = root;
     // if prefix is not empty string, then search whether completion exists
     if (prefix.length() != 0) {
@@ -249,6 +253,9 @@ std::vector<string> DictionaryTrie::predictUnderscores(
     vector<string> results;
     if (root == 0) {
         // empty tree, no completions
+        return results;
+    }
+    if (numCompletions == 0) {
         return results;
     }
     if (pattern.length() == 0) {
