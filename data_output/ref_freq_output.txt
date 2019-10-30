@@ -234,3 +234,69 @@ delime
 delist
 deltic
 Continue? (y/n)
+Enter a prefix/pattern to search for:
+Enter a number of completions:
+be
+of
+is
+in
+to
+it
+im
+he
+do
+on
+we
+at
+by
+or
+as
+go
+my
+if
+me
+so
+up
+an
+no
+us
+oh
+id
+mr
+hw
+ow
+um
+aw
+ya
+em
+eh
+ok
+zu
+dr
+am
+sn
+pm
+la
+tv
+bo
+mm
+uh
+yo
+ay
+ew
+hi
+er
+Continue? (y/n)
+Enter a prefix/pattern to search for:
+Enter a number of completions:
+small
+among
+image
+emily
+smile
+empty
+smart
+email
+smalt
+smarm
+Continue? (y/n)

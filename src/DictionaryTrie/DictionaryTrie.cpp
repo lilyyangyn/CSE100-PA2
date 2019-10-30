@@ -383,14 +383,8 @@ void DictionaryTrie::underscoreHelper(
             // recursion
             string nextPattern = ptr->letter + pattern.substr(i);
             underscoreHelper(nextPattern, ptr, q, k);
-            if (ptr->left != nullptr) {
-                nextPattern = ptr->left->letter + pattern.substr(i);
-                underscoreHelper(nextPattern, ptr->left, q, k);
-            }
-            if (ptr->right != nullptr) {
-                nextPattern = ptr->right->letter + pattern.substr(i);
-                underscoreHelper(nextPattern, ptr->right, q, k);
-            }
+            underscoreHelper(pattern.substr(i - 1), ptr->left, q, k);
+            underscoreHelper(pattern.substr(i - 1), ptr->right, q, k);
             return;
         }
         if (letter < ptr->letter) {
